@@ -1,5 +1,7 @@
 #include "pomodoro_cpp_linux.h"
 
+pomodoro_main_loop_class* pomodoro_main_loop_class::self = nullptr;
+
 void pomodoro_timer::setTimeout(){
     canceled = false;
     std::thread t2d([=]() {
@@ -67,18 +69,18 @@ void pomodoro_main_loop_class::nextState(){
     switch(states[my_state]){
         case my_states::WORKING:
             current_timer = new pomodoro_timer(my_params.work_time, my_cb);
-             my_actions.working->act();
+             my_actions.working->act(my_params.work_time);
         break;
         case my_states::ON_SBREAK:
             current_timer = new pomodoro_timer(my_params.short_break, my_cb);
-            my_actions.s_break->act();
+            my_actions.s_break->act(my_params.short_break);
         break;
         case my_states::ON_LBREAK:
             current_timer = new pomodoro_timer(my_params.long_break, my_cb);
-            my_actions.l_break->act();
+            my_actions.l_break->act(my_params.long_break);
         break;
         case my_states::END:
-            my_actions.end->act();
+            my_actions.end->act(0);
             my_state = -1;
             if(my_params.my_type == pomodoro_parameters::INFINITE) nextState();
         break;
@@ -104,25 +106,25 @@ std::vector<pomodoro_main_loop_class::my_states> statelist = {
 };
 struct w_act : public action{
     w_act() = default;
-    void act(){
+    void act(int duration){
         std::cout<<"Dummy work action."<<std::endl;
     }
 };
 struct s_act : public action{
     s_act() = default;
-    void act(){
+    void act(int duration){
         std::cout<<"Dummy short action."<<std::endl;
     }
 };
 struct l_act : public action{
     l_act() = default;
-    void act(){
+    void act(int duration){
         std::cout<<"Dummy long action."<<std::endl;
     }
 };
 struct e_act : public action{
     e_act() = default;
-    void act(){
+    void act(int duration){
         std::cout<<"End"<<std::endl;
     }
 };

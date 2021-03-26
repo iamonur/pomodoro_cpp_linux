@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 struct action{
-    virtual void act() = 0;
+    virtual void act(int duration) = 0;//Some actions may require a duration, such as a stopwatch.
 };
 
 struct pomodoro_parameters{
@@ -63,6 +63,5 @@ class pomodoro_main_loop_class{
         void nextState();
 };
 
-pomodoro_main_loop_class* pomodoro_main_loop_class::self = nullptr;
 
 #endif //POMODORO_H
