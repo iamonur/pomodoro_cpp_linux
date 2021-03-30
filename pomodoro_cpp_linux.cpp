@@ -68,15 +68,15 @@ void pomodoro_main_loop_class::nextState(){
     my_state = my_state%(states.size());
     switch(states[my_state]){
         case my_states::WORKING:
-            current_timer = new pomodoro_timer(my_params.work_time, my_cb);
+            current_timer = new pomodoro_timer(my_params.work_time * 60 * 1000, my_cb);
              my_actions.working->act(my_params.work_time);
         break;
         case my_states::ON_SBREAK:
-            current_timer = new pomodoro_timer(my_params.short_break, my_cb);
+            current_timer = new pomodoro_timer(my_params.short_break * 60 * 1000, my_cb);
             my_actions.s_break->act(my_params.short_break);
         break;
         case my_states::ON_LBREAK:
-            current_timer = new pomodoro_timer(my_params.long_break, my_cb);
+            current_timer = new pomodoro_timer(my_params.long_break * 60 * 1000, my_cb);
             my_actions.l_break->act(my_params.long_break);
         break;
         case my_states::END:
