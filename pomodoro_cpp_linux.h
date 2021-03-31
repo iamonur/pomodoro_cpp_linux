@@ -49,7 +49,6 @@ class pomodoro_main_loop_class{
     private:    
         std::vector<my_states> states;
         pomodoro_main_loop_class(pomodoro_parameters params, pomodoro_actions actions, std::vector<my_states> stateVec);
-        ~pomodoro_main_loop_class();
         unsigned int my_state;
         static pomodoro_main_loop_class* self;
         pomodoro_parameters my_params;
@@ -58,8 +57,7 @@ class pomodoro_main_loop_class{
     public:
         static pomodoro_main_loop_class* getAppHandle(pomodoro_parameters params, pomodoro_actions actions, std::vector<my_states> stateVec);
         static pomodoro_main_loop_class* getAppHandle();
-        static bool destruct();
-        std::function<void()> my_cb;
+        
         void nextState();
 };
 

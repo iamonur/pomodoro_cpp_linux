@@ -27,20 +27,16 @@ pomodoro_timer::~pomodoro_timer(){
     cancel();
 }
 //
+std::function<void()> my_cb = []() {
+        pomodoro_main_loop_class::getAppHandle()->nextState();
+    };
 pomodoro_main_loop_class::pomodoro_main_loop_class(pomodoro_parameters params, pomodoro_actions actions, std::vector<my_states> stateVec){
     my_state = -1;
     states = stateVec;
     my_params = params;
     my_actions = actions; 
-    my_cb = []() {
-        
-        pomodoro_main_loop_class::getAppHandle()->nextState();
-    };
+    
     nextState();
-}
-//
-pomodoro_main_loop_class::~pomodoro_main_loop_class(){
-
 }
 //
 pomodoro_main_loop_class* pomodoro_main_loop_class::getAppHandle(pomodoro_parameters params, pomodoro_actions actions, std::vector<my_states> stateVec){
@@ -49,19 +45,14 @@ pomodoro_main_loop_class* pomodoro_main_loop_class::getAppHandle(pomodoro_parame
 }
 //
 pomodoro_main_loop_class* pomodoro_main_loop_class::getAppHandle(){
-    if (self == nullptr) throw "WTF";
+    
+    if (self == nullptr) {throw "WTF";}
     return self;
-}
-//
-bool pomodoro_main_loop_class::destruct(){
-    if(self == nullptr) return false;
-    delete self;
-    return true;
 }
 //
 void pomodoro_main_loop_class::nextState(){
     if(current_timer != nullptr){
-        delete current_timer;
+        delete current_timer; //TODO: that line should make into prod.
         current_timer = nullptr;
     }
     my_state++;
@@ -85,7 +76,7 @@ void pomodoro_main_loop_class::nextState(){
             if(my_params.my_type == pomodoro_parameters::INFINITE) nextState();
         break;
         default:
-            std::cout<<my_state<<std::endl;
+            std::cout<<"my_state"<<std::endl;
             throw "WTF2";
     }
         

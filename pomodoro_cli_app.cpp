@@ -31,17 +31,17 @@ struct action_timer : public action_cli {
     std::thread timer_thread;
     void act(int duration){
         timer_thread = std::thread([=](){
-            int dur = duration;
+            int dur = duration*60;
             while(dur){
                 system("clear");
-                std::cout<<std::setfill(' ')<<std::setw(44)<<"REMAINING TIME TO FINISH"<<std::endl;
+                std::cout<<"Time to finish: "<<my_item_type<<". Target: "<<duration<<":00"<<std::endl;
                 std::cout<<std::setfill(' ')<<std::setw(20)<<"Minutes: "<<std::setw(2)<<dur/60<<std::setw(20)<<"Seconds: "<<std::setw(2)<<dur%60<<std::endl;
                 dur--;
                 std::this_thread::sleep_for(std::chrono::seconds(1)); //TODO: There will be losses here, try to build a more accurate timer.
             }
 
         });
-        timer_thread.join();
+        timer_thread.detach();
     }
 };
 
@@ -49,7 +49,15 @@ struct action_stopwatch : public action_cli {
     using action_cli::action_cli;
     std::thread stopwatch_thread;
     void act(int duration){
-        system("clear");
+        stopwatch_thread = std::thread([=](){
+            int dur = 0;
+            int foo = duration*60;
+            while(dur != foo){
+                system("clear");
+                std::cout<<"Time to finish: "<<my_item_type<<". Target: "<<duration<<":00"<<std::endl;
+                std::cout<<std::setfill(' ')<<std::setw(20)<<"Minutes: "<<
+            }
+        });
     }
 };
 
@@ -239,6 +247,6 @@ int main(int argc, char** argv) {
     
     cli_app* app = cli_app::getCLIApp(cli_params);
     while(true){
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        std::this_thread::sleep_for(std::chrono::seconds(10000));
     }
 }
