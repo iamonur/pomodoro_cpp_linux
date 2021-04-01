@@ -3,13 +3,23 @@
 #include <iomanip>
 #include <getopt.h>
 #include <string>
-/*
-*
-*
-*
-*
-*
-*/
+
+//Thanks to: https://stackoverflow.com/questions/15777073/how-do-you-print-a-c11-time-point
+template<typename Clock, typename Duration> std::ostream &operator<<(std::ostream &stream, const std::chrono::time_point<Clock, Duration> &time_point) {
+  const time_t time = Clock::to_time_t(time_point);
+#if __GNUC__ > 4 || \
+    ((__GNUC__ == 4) && __GNUC_MINOR__ > 8 && __GNUC_REVISION__ > 1)
+  // Maybe the put_time will be implemented later?
+  struct tm tm;
+  localtime_r(&time, &tm);
+  return stream << std::put_time(&tm, "%c"); // Print standard date&time
+#else
+  char buffer[26];
+  ctime_r(&time, buffer);
+  buffer[24] = '\0';  // Removes the newline that is added
+  return stream << buffer;
+#endif
+}
 
 struct action_cli : public action {
     std::string my_item_type;
@@ -55,9 +65,12 @@ struct action_stopwatch : public action_cli {
             while(dur != foo){
                 system("clear");
                 std::cout<<"Time to finish: "<<my_item_type<<". Target: "<<duration<<":00"<<std::endl;
-                std::cout<<std::setfill(' ')<<std::setw(20)<<"Minutes: "<<
+                std::cout<<std::setfill(' ')<<std::setw(20)<<"Minutes: "<<dur/60<<std::setw(20)<<"Seconds: "<<std::setw(2)<<dur%60<<std::endl;
+                dur++;
+                std::this_thread::sleep_for(std::chrono::seconds(1)); //TODO: There will be losses here, try to build a more accurate stopwatch.
             }
         });
+        stopwatch_thread.detach();
     }
 };
 
@@ -65,10 +78,18 @@ struct action_clock : public action_cli {
     using action_cli::action_cli;
     std::thread clock_thread;
     void act(int duration){
-        system("clear");
+        clock_thread = std::thread([=](){
+            std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+            std::chrono::time_point<std::chrono::system_clock> end   = start + std::chrono::minutes(duration);
+            while(std::chrono::system_clock::now() < end){
+                system("clear");
+                std::cout<<"It's time to: "<<my_item_type<<". It will be finished at: "<<end<<std::endl;
+                std::cout<<"Now it is: "<<std::chrono::system_clock::now()<<std::endl;
+            }
+        });
+        clock_thread.detach();
     }
 };
-
 
 void display_help(){
     std::cout<<"Help for Pomodoro CLI app:\n\
@@ -97,7 +118,6 @@ void display_help(){
             default value: 0\n\
     "<<std::endl;
 }
-
 
 struct cli_config{
     std::string pattern = "WSWSWSWL";
